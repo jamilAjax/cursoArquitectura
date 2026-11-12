@@ -1,0 +1,5 @@
+target/
+*:Zone.Identifier
+.idea/
+*.iml
+.vscode/
