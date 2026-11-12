@@ -1,0 +1,42 @@
+# LAB 5 - Plantilla del pipeline DevSecOps.
+# Copiar a .github/workflows/ci.yml y completar los TODO.
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+jobs:
+  construir-y-probar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Compilar, pruebas y umbral de cobertura
+        run: mvn -B verify
+
+      # TODO 1 (fitness function): ejecutar las reglas de arquitectura del modulo hexagonal
+      #   pista: mvn -B test -Parquitectura -Dtest=ReglasHexagonalesTest
+
+      # TODO 2 (SCA): analizar dependencias vulnerables y fallar con CVSS >= 7
+      #   pista: aquasecurity/trivy-action en modo "fs" con severity CRITICAL,HIGH y exit-code 1
+
+      # TODO 3 (secretos): detectar llaves y contrasenas en el codigo
+      #   pista: gitleaks/gitleaks-action o trivy con scanners: secret
+
+  imagen:
+    needs: construir-y-probar
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # TODO 4: construir la imagen con docker/Dockerfile y escanearla con Trivy (modo "image")
+      # TODO 5 (GitOps, opcional): publicar la imagen y actualizar el tag en el repo de manifiestos

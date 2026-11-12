@@ -1,0 +1,29 @@
+# LAB 7 - Escalado horizontal de MercaPlus
+# Desde la raiz del repo:  docker compose -f docker/docker-compose.yml up --build --scale app=3
+# Balanceador en http://localhost:8080
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    expose:
+      - "8080"
+    # Paso 3 del lab: descomentar al externalizar el carrito
+    # environment:
+    #   SPRING_DATA_REDIS_HOST: redis
+    # depends_on:
+    #   - redis
+
+  balanceador:
+    image: nginx:1.27-alpine
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - app
+
+  # redis:
+  #   image: redis:7-alpine
+  #   ports:
+  #     - "6379:6379"
