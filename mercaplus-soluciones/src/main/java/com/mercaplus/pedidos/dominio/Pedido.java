@@ -5,10 +5,13 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.stereotype.Component;
+
 /**
  * Agregado Pedido. No conoce Spring, JPA ni la pasarela de pagos:
  * las transiciones de estado son reglas de negocio y se prueban sin infraestructura.
  */
+@Component
 public class Pedido {
 
     public static final int MAX_LINEAS = 50;
