@@ -43,6 +43,7 @@ jobs:
           severity: CRITICAL,HIGH
           exit-code: '1'
           ignore-unfixed: true
+          trivyignores: .trivyignore
 
   imagen:
     needs: construir-y-probar
@@ -60,6 +61,7 @@ jobs:
           severity: CRITICAL,HIGH
           exit-code: '1'
           ignore-unfixed: true
+          trivyignores: .trivyignore
 
       # GitOps (demostracion): en main se publica la imagen en Amazon ECR y se actualiza el tag
       # en el repositorio de manifiestos; Argo CD (o el despliegue de ECS) reconcilia el cambio.

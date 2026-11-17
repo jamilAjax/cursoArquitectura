@@ -1,0 +1,4 @@
+# Excepciones de seguridad aceptadas. Revisar al migrar a Spring Boot 4 / Spring Framework 7.
+# spring-webmvc 6.2.x: corregido solo en 7.0.9. La aplicacion no usa XsltView ni Server-Sent Events.
+CVE-2026-47884
+CVE-2026-47890
