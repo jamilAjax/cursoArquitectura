@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LineaPedido.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">mercaplus-legacy</a> &gt; <a href="index.source.html" class="el_package">com.mercaplus.model</a> &gt; <span class="el_source">LineaPedido.java</span></div><h1>LineaPedido.java</h1><pre class="source lang-java linenums">package com.mercaplus.model;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+import java.math.BigDecimal;
+
+@Entity
+@Table(name = &quot;linea_pedido&quot;)
+<span class="nc" id="L9">public class LineaPedido {</span>
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne
+    private Producto producto;
+
+    @ManyToOne
+    @JsonIgnore
+    private Pedido pedido;
+
+    private int cantidad;
+    private BigDecimal precioUnitario;
+
+<span class="nc" id="L25">    public Long getId() { return id; }</span>
+<span class="nc" id="L26">    public Producto getProducto() { return producto; }</span>
+<span class="nc" id="L27">    public void setProducto(Producto producto) { this.producto = producto; }</span>
+<span class="nc" id="L28">    public Pedido getPedido() { return pedido; }</span>
+<span class="nc" id="L29">    public void setPedido(Pedido pedido) { this.pedido = pedido; }</span>
+<span class="nc" id="L30">    public int getCantidad() { return cantidad; }</span>
+<span class="nc" id="L31">    public void setCantidad(int cantidad) { this.cantidad = cantidad; }</span>
+<span class="nc" id="L32">    public BigDecimal getPrecioUnitario() { return precioUnitario; }</span>
+<span class="nc" id="L33">    public void setPrecioUnitario(BigDecimal precioUnitario) { this.precioUnitario = precioUnitario; }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MotorPromociones.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">mercaplus-legacy</a> &gt; <a href="index.source.html" class="el_package">com.mercaplus.promociones</a> &gt; <span class="el_source">MotorPromociones.java</span></div><h1>MotorPromociones.java</h1><pre class="source lang-java linenums">package com.mercaplus.promociones;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * SOLUCION LAB 3 - Motor de promociones de Black Friday, construido con TDD (reglas 1 a 8).
+ */
+public class MotorPromociones {
+
+<span class="fc" id="L13">    private static final BigDecimal TOPE_AHORRO = new BigDecimal(&quot;0.50&quot;);</span>
+
+    private final Map&lt;String, BigDecimal&gt; descuentoPorCategoria;
+
+<span class="fc" id="L17">    public MotorPromociones(Map&lt;String, BigDecimal&gt; descuentoPorCategoria) {</span>
+<span class="fc" id="L18">        this.descuentoPorCategoria = Map.copyOf(descuentoPorCategoria);</span>
+<span class="fc" id="L19">    }</span>
+
+    public BigDecimal totalAPagar(List&lt;Item&gt; items, BigDecimal cupon) {
+<span class="fc" id="L22">        BigDecimal bruto = BigDecimal.ZERO;</span>
+<span class="fc" id="L23">        BigDecimal ahorroPromos = BigDecimal.ZERO;</span>
+
+<span class="fc bfc" id="L25" title="All 2 branches covered.">        for (Item item : items) {</span>
+<span class="fc" id="L26">            validar(item);</span>
+<span class="fc" id="L27">            BigDecimal valorItem = item.precioUnitario().multiply(BigDecimal.valueOf(item.cantidad()));</span>
+<span class="fc" id="L28">            bruto = bruto.add(valorItem);</span>
+<span class="fc" id="L29">            ahorroPromos = ahorroPromos.add(mejorAhorro(item, valorItem));</span>
+        }
+
+<span class="pc bpc" id="L32" title="1 of 2 branches missed.">        BigDecimal valorCupon = cupon == null ? BigDecimal.ZERO : cupon.max(BigDecimal.ZERO);</span>
+<span class="fc" id="L33">        BigDecimal ahorroTotal = ahorroPromos.add(valorCupon)</span>
+<span class="fc" id="L34">                .min(bruto.multiply(TOPE_AHORRO));</span>
+
+<span class="fc" id="L36">        return bruto.subtract(ahorroTotal)</span>
+<span class="fc" id="L37">                .max(BigDecimal.ZERO)</span>
+<span class="fc" id="L38">                .setScale(0, RoundingMode.HALF_UP);</span>
+    }
+
+    private BigDecimal mejorAhorro(Item item, BigDecimal valorItem) {
+<span class="fc bfc" id="L42" title="All 2 branches covered.">        BigDecimal ahorro2x1 = item.promo2x1()</span>
+<span class="fc" id="L43">                ? item.precioUnitario().multiply(BigDecimal.valueOf(item.cantidad() / 2))</span>
+<span class="fc" id="L44">                : BigDecimal.ZERO;</span>
+<span class="fc" id="L45">        BigDecimal ahorroCategoria = valorItem.multiply(</span>
+<span class="fc" id="L46">                descuentoPorCategoria.getOrDefault(item.categoria(), BigDecimal.ZERO));</span>
+<span class="fc" id="L47">        return ahorro2x1.max(ahorroCategoria);</span>
+    }
+
+    private static void validar(Item item) {
+<span class="fc bfc" id="L51" title="All 2 branches covered.">        if (item.cantidad() &lt;= 0) {</span>
+<span class="fc" id="L52">            throw new IllegalArgumentException(&quot;La cantidad debe ser positiva: &quot; + item.sku());</span>
+        }
+<span class="pc bpc" id="L54" title="1 of 4 branches missed.">        if (item.precioUnitario() == null || item.precioUnitario().signum() &lt; 0) {</span>
+<span class="fc" id="L55">            throw new IllegalArgumentException(&quot;El precio no puede ser negativo: &quot; + item.sku());</span>
+        }
+<span class="fc" id="L57">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

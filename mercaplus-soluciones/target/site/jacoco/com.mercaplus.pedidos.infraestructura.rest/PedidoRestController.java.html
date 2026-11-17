@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PedidoRestController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">mercaplus-legacy</a> &gt; <a href="index.source.html" class="el_package">com.mercaplus.pedidos.infraestructura.rest</a> &gt; <span class="el_source">PedidoRestController.java</span></div><h1>PedidoRestController.java</h1><pre class="source lang-java linenums"><span class="fc" id="L1">package com.mercaplus.pedidos.infraestructura.rest;</span>
+
+import com.mercaplus.pedidos.aplicacion.puerto.entrada.CrearPedidoUseCase;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+/** Adaptador primario REST. Valida la forma de la peticion; las reglas de negocio viven en el dominio. */
+@RestController
+@RequestMapping(&quot;/api/v2/pedidos&quot;)
+public class PedidoRestController {
+
+    private final CrearPedidoUseCase crearPedido;
+
+<span class="fc" id="L19">    public PedidoRestController(CrearPedidoUseCase crearPedido) {</span>
+<span class="fc" id="L20">        this.crearPedido = crearPedido;</span>
+<span class="fc" id="L21">    }</span>
+
+    public record ItemDto(
+            @NotBlank @Pattern(regexp = &quot;^[A-Z0-9-]{3,20}$&quot;) String sku,
+            @Min(1) @Max(100) int cantidad) {}
+
+    public record SolicitudPedidoDto(
+            @NotBlank @Size(max = 40) String clienteId,
+            @NotEmpty @Size(max = 50) List&lt;@Valid ItemDto&gt; items,
+            @PositiveOrZero BigDecimal cupon) {}
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public CrearPedidoUseCase.ResultadoPedido crear(@Valid @RequestBody SolicitudPedidoDto solicitud) {
+<span class="fc" id="L35">        var comando = new CrearPedidoUseCase.Comando(</span>
+<span class="fc" id="L36">                solicitud.clienteId(),</span>
+<span class="fc" id="L37">                solicitud.items().stream().map(i -&gt; new CrearPedidoUseCase.ItemComando(i.sku(), i.cantidad())).toList(),</span>
+<span class="fc" id="L38">                solicitud.cupon());</span>
+<span class="fc" id="L39">        return crearPedido.ejecutar(comando);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

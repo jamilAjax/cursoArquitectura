@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Pedido.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">mercaplus-legacy</a> &gt; <a href="index.source.html" class="el_package">com.mercaplus.pedidos.dominio</a> &gt; <span class="el_source">Pedido.java</span></div><h1>Pedido.java</h1><pre class="source lang-java linenums">package com.mercaplus.pedidos.dominio;
+
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.util.List;
+import java.util.UUID;
+
+/**
+ * Agregado Pedido. No conoce Spring, JPA ni la pasarela de pagos:
+ * las transiciones de estado son reglas de negocio y se prueban sin infraestructura.
+ */
+public class Pedido {
+
+    public static final int MAX_LINEAS = 50;
+
+    private final String id;
+    private final String clienteId;
+    private final Instant creadoEn;
+    private final List&lt;LineaPedido&gt; lineas;
+    private final BigDecimal totalAPagar;
+    private EstadoPedido estado;
+    private String referenciaPago;
+
+<span class="fc" id="L24">    private Pedido(String id, String clienteId, Instant creadoEn, List&lt;LineaPedido&gt; lineas,</span>
+                   BigDecimal totalAPagar, EstadoPedido estado, String referenciaPago) {
+<span class="fc" id="L26">        this.id = id;</span>
+<span class="fc" id="L27">        this.clienteId = clienteId;</span>
+<span class="fc" id="L28">        this.creadoEn = creadoEn;</span>
+<span class="fc" id="L29">        this.lineas = List.copyOf(lineas);</span>
+<span class="fc" id="L30">        this.totalAPagar = totalAPagar;</span>
+<span class="fc" id="L31">        this.estado = estado;</span>
+<span class="fc" id="L32">        this.referenciaPago = referenciaPago;</span>
+<span class="fc" id="L33">    }</span>
+
+    public static Pedido crear(String clienteId, List&lt;LineaPedido&gt; lineas, BigDecimal totalAPagar) {
+<span class="pc bpc" id="L36" title="2 of 4 branches missed.">        if (clienteId == null || clienteId.isBlank()) {</span>
+<span class="nc" id="L37">            throw new PedidoInvalidoException(&quot;El pedido necesita un cliente&quot;);</span>
+        }
+<span class="pc bpc" id="L39" title="1 of 4 branches missed.">        if (lineas == null || lineas.isEmpty()) {</span>
+<span class="fc" id="L40">            throw new PedidoInvalidoException(&quot;El pedido debe tener al menos una linea&quot;);</span>
+        }
+<span class="fc bfc" id="L42" title="All 2 branches covered.">        if (lineas.size() &gt; MAX_LINEAS) {</span>
+<span class="fc" id="L43">            throw new PedidoInvalidoException(&quot;El pedido supera &quot; + MAX_LINEAS + &quot; lineas&quot;);</span>
+        }
+<span class="fc" id="L45">        BigDecimal bruto = lineas.stream().map(LineaPedido::subtotal).reduce(BigDecimal.ZERO, BigDecimal::add);</span>
+<span class="pc bpc" id="L46" title="2 of 6 branches missed.">        if (totalAPagar == null || totalAPagar.signum() &lt; 0 || totalAPagar.compareTo(bruto) &gt; 0) {</span>
+<span class="fc" id="L47">            throw new PedidoInvalidoException(&quot;El total a pagar debe estar entre 0 y el valor bruto&quot;);</span>
+        }
+<span class="fc" id="L49">        return new Pedido(UUID.randomUUID().toString(), clienteId, Instant.now(), lineas,</span>
+<span class="fc" id="L50">                totalAPagar, EstadoPedido.CREADO, null);</span>
+    }
+
+    /** Reconstruye un pedido ya existente (usado por los adaptadores de persistencia). */
+    public static Pedido reconstruir(String id, String clienteId, Instant creadoEn, List&lt;LineaPedido&gt; lineas,
+                                     BigDecimal totalAPagar, EstadoPedido estado, String referenciaPago) {
+<span class="fc" id="L56">        return new Pedido(id, clienteId, creadoEn, lineas, totalAPagar, estado, referenciaPago);</span>
+    }
+
+    public void registrarPago(String referencia) {
+<span class="fc" id="L60">        exigirEstado(EstadoPedido.CREADO);</span>
+<span class="pc bpc" id="L61" title="2 of 4 branches missed.">        if (referencia == null || referencia.isBlank()) {</span>
+<span class="nc" id="L62">            throw new PedidoInvalidoException(&quot;Un pago aprobado requiere referencia&quot;);</span>
+        }
+<span class="fc" id="L64">        this.referenciaPago = referencia;</span>
+<span class="fc" id="L65">        this.estado = EstadoPedido.PAGADO;</span>
+<span class="fc" id="L66">    }</span>
+
+    public void rechazarPago() {
+<span class="fc" id="L69">        exigirEstado(EstadoPedido.CREADO);</span>
+<span class="fc" id="L70">        this.estado = EstadoPedido.PAGO_RECHAZADO;</span>
+<span class="fc" id="L71">    }</span>
+
+    public void cancelar() {
+<span class="nc bnc" id="L74" title="All 2 branches missed.">        if (estado == EstadoPedido.CANCELADO) {</span>
+<span class="nc" id="L75">            throw new PedidoInvalidoException(&quot;El pedido ya estaba cancelado&quot;);</span>
+        }
+<span class="nc" id="L77">        this.estado = EstadoPedido.CANCELADO;</span>
+<span class="nc" id="L78">    }</span>
+
+    private void exigirEstado(EstadoPedido esperado) {
+<span class="fc bfc" id="L81" title="All 2 branches covered.">        if (estado != esperado) {</span>
+<span class="fc" id="L82">            throw new PedidoInvalidoException(&quot;Transicion invalida desde &quot; + estado);</span>
+        }
+<span class="fc" id="L84">    }</span>
+
+    public BigDecimal valorBruto() {
+<span class="fc" id="L87">        return lineas.stream().map(LineaPedido::subtotal).reduce(BigDecimal.ZERO, BigDecimal::add);</span>
+    }
+
+    public BigDecimal descuento() {
+<span class="fc" id="L91">        return valorBruto().subtract(totalAPagar);</span>
+    }
+
+<span class="fc" id="L94">    public String id() { return id; }</span>
+<span class="fc" id="L95">    public String clienteId() { return clienteId; }</span>
+<span class="fc" id="L96">    public Instant creadoEn() { return creadoEn; }</span>
+<span class="fc" id="L97">    public List&lt;LineaPedido&gt; lineas() { return lineas; }</span>
+<span class="fc" id="L98">    public BigDecimal totalAPagar() { return totalAPagar; }</span>
+<span class="fc" id="L99">    public EstadoPedido estado() { return estado; }</span>
+<span class="fc" id="L100">    public String referenciaPago() { return referenciaPago; }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

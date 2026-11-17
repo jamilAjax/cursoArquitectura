@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CrearPedidoService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">mercaplus-legacy</a> &gt; <a href="index.source.html" class="el_package">com.mercaplus.pedidos.aplicacion</a> &gt; <span class="el_source">CrearPedidoService.java</span></div><h1>CrearPedidoService.java</h1><pre class="source lang-java linenums">package com.mercaplus.pedidos.aplicacion;
+
+import com.mercaplus.pedidos.aplicacion.puerto.entrada.CrearPedidoUseCase;
+import com.mercaplus.pedidos.aplicacion.puerto.salida.CatalogoPort;
+import com.mercaplus.pedidos.aplicacion.puerto.salida.CatalogoPort.ProductoCatalogo;
+import com.mercaplus.pedidos.aplicacion.puerto.salida.PagosPort;
+import com.mercaplus.pedidos.aplicacion.puerto.salida.PedidoRepositoryPort;
+import com.mercaplus.pedidos.aplicacion.puerto.salida.PromocionesPort;
+import com.mercaplus.pedidos.dominio.LineaPedido;
+import com.mercaplus.pedidos.dominio.Pedido;
+import com.mercaplus.pedidos.dominio.PedidoInvalidoException;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Caso de uso &quot;Crear pedido&quot;. Sin anotaciones de Spring: se instancia en
+ * infraestructura.config, lo que mantiene el nucleo independiente del framework.
+ */
+public class CrearPedidoService implements CrearPedidoUseCase {
+
+    private final CatalogoPort catalogo;
+    private final PromocionesPort promociones;
+    private final PagosPort pagos;
+    private final PedidoRepositoryPort pedidos;
+
+<span class="fc" id="L28">    public CrearPedidoService(CatalogoPort catalogo, PromocionesPort promociones,</span>
+                              PagosPort pagos, PedidoRepositoryPort pedidos) {
+<span class="fc" id="L30">        this.catalogo = catalogo;</span>
+<span class="fc" id="L31">        this.promociones = promociones;</span>
+<span class="fc" id="L32">        this.pagos = pagos;</span>
+<span class="fc" id="L33">        this.pedidos = pedidos;</span>
+<span class="fc" id="L34">    }</span>
+
+    @Override
+    public ResultadoPedido ejecutar(Comando comando) {
+<span class="pc bpc" id="L38" title="2 of 4 branches missed.">        if (comando.items() == null || comando.items().isEmpty()) {</span>
+<span class="nc" id="L39">            throw new PedidoInvalidoException(&quot;El pedido debe tener al menos un item&quot;);</span>
+        }
+
+<span class="fc" id="L42">        List&lt;LineaPedido&gt; lineas = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L43" title="All 2 branches covered.">        for (ItemComando item : comando.items()) {</span>
+<span class="fc" id="L44">            ProductoCatalogo producto = catalogo.buscarPorSku(item.sku())</span>
+<span class="fc" id="L45">                    .orElseThrow(() -&gt; new PedidoInvalidoException(&quot;Producto no existe: &quot; + item.sku()));</span>
+<span class="fc bfc" id="L46" title="All 2 branches covered.">            if (producto.stockDisponible() &lt; item.cantidad()) {</span>
+<span class="fc" id="L47">                throw new PedidoInvalidoException(&quot;Sin stock suficiente: &quot; + item.sku());</span>
+            }
+<span class="fc" id="L49">            lineas.add(new LineaPedido(producto.sku(), producto.categoria(), item.cantidad(),</span>
+<span class="fc" id="L50">                    producto.precio(), producto.promo2x1()));</span>
+        }
+
+<span class="pc bpc" id="L53" title="1 of 2 branches missed.">        BigDecimal cupon = comando.cupon() == null ? BigDecimal.ZERO : comando.cupon();</span>
+<span class="fc" id="L54">        BigDecimal total = promociones.totalConPromociones(lineas, cupon);</span>
+<span class="fc" id="L55">        Pedido pedido = Pedido.crear(comando.clienteId(), lineas, total);</span>
+
+<span class="fc" id="L57">        PagosPort.ResultadoPago pago = pagos.cobrar(pedido.id(), pedido.clienteId(), pedido.totalAPagar());</span>
+<span class="fc bfc" id="L58" title="All 2 branches covered.">        if (pago.aprobado()) {</span>
+<span class="fc" id="L59">            pedido.registrarPago(pago.referencia());</span>
+<span class="fc" id="L60">            lineas.forEach(l -&gt; catalogo.reservarStock(l.sku(), l.cantidad()));</span>
+<span class="fc" id="L61">        } else {</span>
+<span class="fc" id="L62">            pedido.rechazarPago();</span>
+        }
+
+<span class="fc" id="L65">        Pedido guardado = pedidos.guardar(pedido);</span>
+<span class="fc" id="L66">        return new ResultadoPedido(guardado.id(), guardado.estado().name(), guardado.valorBruto(),</span>
+<span class="fc" id="L67">                guardado.descuento(), guardado.totalAPagar(), guardado.referenciaPago());</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

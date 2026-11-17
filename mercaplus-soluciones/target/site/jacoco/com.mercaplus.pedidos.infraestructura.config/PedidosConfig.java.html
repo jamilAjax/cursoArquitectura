@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PedidosConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">mercaplus-legacy</a> &gt; <a href="index.source.html" class="el_package">com.mercaplus.pedidos.infraestructura.config</a> &gt; <span class="el_source">PedidosConfig.java</span></div><h1>PedidosConfig.java</h1><pre class="source lang-java linenums">package com.mercaplus.pedidos.infraestructura.config;
+
+import com.mercaplus.pedidos.aplicacion.CrearPedidoService;
+import com.mercaplus.pedidos.aplicacion.puerto.entrada.CrearPedidoUseCase;
+import com.mercaplus.pedidos.aplicacion.puerto.salida.CatalogoPort;
+import com.mercaplus.pedidos.aplicacion.puerto.salida.PagosPort;
+import com.mercaplus.pedidos.aplicacion.puerto.salida.PedidoRepositoryPort;
+import com.mercaplus.pedidos.aplicacion.puerto.salida.PromocionesPort;
+import com.mercaplus.pedidos.infraestructura.pagos.PasarelaPagosAdapter;
+import com.mercaplus.pedidos.infraestructura.promociones.MotorPromocionesAdapter;
+import com.mercaplus.promociones.MotorPromociones;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.transaction.support.TransactionTemplate;
+
+import java.math.BigDecimal;
+import java.util.Map;
+
+/** Composicion: el unico lugar donde el nucleo se conecta con Spring. */
+@Configuration
+<span class="nc" id="L22">public class PedidosConfig {</span>
+
+    @Bean
+    PromocionesPort promocionesPort() {
+<span class="nc" id="L26">        return new MotorPromocionesAdapter(new MotorPromociones(Map.of(&quot;TECNOLOGIA&quot;, new BigDecimal(&quot;0.20&quot;))));</span>
+    }
+
+    @Bean
+    PagosPort pagosPort(@Value(&quot;${pagaya.api-key}&quot;) String apiKey,
+                        @Value(&quot;${pagaya.limite-aprobacion:5000000}&quot;) BigDecimal limite) {
+<span class="nc" id="L32">        return new PasarelaPagosAdapter(apiKey, limite);</span>
+    }
+
+    @Bean
+    CrearPedidoUseCase crearPedidoUseCase(CatalogoPort catalogo, PromocionesPort promociones, PagosPort pagos,
+                                          PedidoRepositoryPort pedidos, TransactionTemplate transacciones) {
+<span class="nc" id="L38">        CrearPedidoUseCase nucleo = new CrearPedidoService(catalogo, promociones, pagos, pedidos);</span>
+        // Decorador transaccional: la frontera de transaccion es responsabilidad de la infraestructura.
+<span class="nc" id="L40">        return comando -&gt; transacciones.execute(estado -&gt; nucleo.ejecutar(comando));</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

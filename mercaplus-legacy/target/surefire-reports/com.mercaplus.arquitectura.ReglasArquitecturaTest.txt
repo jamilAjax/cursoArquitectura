@@ -1,0 +1,103 @@
+-------------------------------------------------------------------------------
+Test set: com.mercaplus.arquitectura.ReglasArquitecturaTest
+-------------------------------------------------------------------------------
+Tests run: 4, Failures: 4, Errors: 0, Skipped: 0, Time elapsed: 22.71 s <<< FAILURE! -- in com.mercaplus.arquitectura.ReglasArquitecturaTest
+com.mercaplus.arquitectura.ReglasArquitecturaTest.capas_respetadas -- Time elapsed: 22.63 s <<< FAILURE!
+java.lang.AssertionError: 
+Architecture Violation [Priority: MEDIUM] - Rule 'Layered architecture considering only dependencies in layers, consisting of
+layer 'Web' ('..controller..')
+layer 'Aplicacion' ('..service..')
+layer 'Datos' ('..repository..')
+where layer 'Web' may not be accessed by any layer
+where layer 'Aplicacion' may only be accessed by layers ['Web']
+where layer 'Datos' may only be accessed by layers ['Aplicacion']' was violated (13 times):
+Constructor <com.mercaplus.controller.PedidoController.<init>(com.mercaplus.repository.PedidoRepository, com.mercaplus.repository.ProductoRepository, com.mercaplus.service.PromocionService, com.mercaplus.service.PedidoService)> has parameter of type <com.mercaplus.repository.PedidoRepository> in (PedidoController.java:0)
+Constructor <com.mercaplus.controller.PedidoController.<init>(com.mercaplus.repository.PedidoRepository, com.mercaplus.repository.ProductoRepository, com.mercaplus.service.PromocionService, com.mercaplus.service.PedidoService)> has parameter of type <com.mercaplus.repository.ProductoRepository> in (PedidoController.java:0)
+Constructor <com.mercaplus.controller.ProductoController.<init>(com.mercaplus.repository.ProductoRepository, jakarta.persistence.EntityManager)> has parameter of type <com.mercaplus.repository.ProductoRepository> in (ProductoController.java:0)
+Field <com.mercaplus.controller.PedidoController.pedidoRepository> has type <com.mercaplus.repository.PedidoRepository> in (PedidoController.java:0)
+Field <com.mercaplus.controller.PedidoController.productoRepository> has type <com.mercaplus.repository.ProductoRepository> in (PedidoController.java:0)
+Field <com.mercaplus.controller.ProductoController.productoRepository> has type <com.mercaplus.repository.ProductoRepository> in (ProductoController.java:0)
+Method <com.mercaplus.controller.PedidoController.crear(com.mercaplus.controller.PedidoController$SolicitudPedido)> calls method <com.mercaplus.repository.PedidoRepository.save(java.lang.Object)> in (PedidoController.java:70)
+Method <com.mercaplus.controller.PedidoController.crear(com.mercaplus.controller.PedidoController$SolicitudPedido)> calls method <com.mercaplus.repository.ProductoRepository.findBySku(java.lang.String)> in (PedidoController.java:45)
+Method <com.mercaplus.controller.PedidoController.crear(com.mercaplus.controller.PedidoController$SolicitudPedido)> calls method <com.mercaplus.repository.ProductoRepository.save(java.lang.Object)> in (PedidoController.java:53)
+Method <com.mercaplus.controller.PedidoController.porCliente(java.lang.String)> calls method <com.mercaplus.repository.PedidoRepository.findByClienteId(java.lang.String)> in (PedidoController.java:75)
+Method <com.mercaplus.controller.ProductoController.cambiarPrecio(java.lang.Long, com.mercaplus.model.Producto)> calls method <com.mercaplus.repository.ProductoRepository.findById(java.lang.Object)> in (ProductoController.java:35)
+Method <com.mercaplus.controller.ProductoController.cambiarPrecio(java.lang.Long, com.mercaplus.model.Producto)> calls method <com.mercaplus.repository.ProductoRepository.save(java.lang.Object)> in (ProductoController.java:37)
+Method <com.mercaplus.controller.ProductoController.listar()> calls method <com.mercaplus.repository.ProductoRepository.findAll()> in (ProductoController.java:23)
+	at com.tngtech.archunit.lang.ArchRule$Assertions.assertNoViolation(ArchRule.java:94)
+	at com.tngtech.archunit.lang.ArchRule$Assertions.check(ArchRule.java:86)
+	at com.tngtech.archunit.library.Architectures$LayeredArchitecture.check(Architectures.java:347)
+	at com.tngtech.archunit.junit.internal.ArchUnitTestDescriptor$ArchUnitRuleDescriptor.execute(ArchUnitTestDescriptor.java:167)
+	at com.tngtech.archunit.junit.internal.ArchUnitTestDescriptor$ArchUnitRuleDescriptor.execute(ArchUnitTestDescriptor.java:150)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+com.mercaplus.arquitectura.ReglasArquitecturaTest.el_modelo_no_depende_de_infraestructura -- Time elapsed: 0.008 s <<< FAILURE!
+java.lang.AssertionError: 
+Architecture Violation [Priority: MEDIUM] - Rule 'no classes that reside in a package '..model..' should depend on classes that reside in any package ['..util..', '..controller..', '..service..'], because las entidades de negocio no deben conocer pasarelas ni frameworks externos' was violated (5 times):
+Constructor <com.mercaplus.model.Pedido.<init>()> calls constructor <java.util.ArrayList.<init>()> in (Pedido.java:25)
+Field <com.mercaplus.model.Pedido.lineas> has type <java.util.List> in (Pedido.java:0)
+Method <com.mercaplus.model.Pedido.agregarLinea(com.mercaplus.model.LineaPedido)> calls method <java.util.List.add(java.lang.Object)> in (Pedido.java:39)
+Method <com.mercaplus.model.Pedido.getLineas()> has return type <java.util.List> in (Pedido.java:0)
+Method <com.mercaplus.model.Pedido.pagar()> calls method <com.mercaplus.util.PasarelaPagosClient.cobrar(java.lang.String, java.math.BigDecimal)> in (Pedido.java:28)
+	at com.tngtech.archunit.lang.ArchRule$Assertions.assertNoViolation(ArchRule.java:94)
+	at com.tngtech.archunit.lang.ArchRule$Assertions.check(ArchRule.java:86)
+	at com.tngtech.archunit.lang.ArchRule$Factory$SimpleArchRule.check(ArchRule.java:165)
+	at com.tngtech.archunit.junit.internal.ArchUnitTestDescriptor$ArchUnitRuleDescriptor.execute(ArchUnitTestDescriptor.java:167)
+	at com.tngtech.archunit.junit.internal.ArchUnitTestDescriptor$ArchUnitRuleDescriptor.execute(ArchUnitTestDescriptor.java:150)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+com.mercaplus.arquitectura.ReglasArquitecturaTest.los_controladores_no_usan_jpa -- Time elapsed: 0.002 s <<< FAILURE!
+java.lang.AssertionError: 
+Architecture Violation [Priority: MEDIUM] - Rule 'no classes that reside in a package '..controller..' should depend on classes that reside in any package ['jakarta.persistence..'], because la capa web no debe construir consultas a la base de datos' was violated (4 times):
+Constructor <com.mercaplus.controller.ProductoController.<init>(com.mercaplus.repository.ProductoRepository, jakarta.persistence.EntityManager)> has parameter of type <jakarta.persistence.EntityManager> in (ProductoController.java:0)
+Field <com.mercaplus.controller.ProductoController.entityManager> has type <jakarta.persistence.EntityManager> in (ProductoController.java:0)
+Method <com.mercaplus.controller.ProductoController.buscar(java.lang.String)> calls method <jakarta.persistence.EntityManager.createNativeQuery(java.lang.String, java.lang.Class)> in (ProductoController.java:30)
+Method <com.mercaplus.controller.ProductoController.buscar(java.lang.String)> calls method <jakarta.persistence.Query.getResultList()> in (ProductoController.java:30)
+	at com.tngtech.archunit.lang.ArchRule$Assertions.assertNoViolation(ArchRule.java:94)
+	at com.tngtech.archunit.lang.ArchRule$Assertions.check(ArchRule.java:86)
+	at com.tngtech.archunit.lang.ArchRule$Factory$SimpleArchRule.check(ArchRule.java:165)
+	at com.tngtech.archunit.junit.internal.ArchUnitTestDescriptor$ArchUnitRuleDescriptor.execute(ArchUnitTestDescriptor.java:167)
+	at com.tngtech.archunit.junit.internal.ArchUnitTestDescriptor$ArchUnitRuleDescriptor.execute(ArchUnitTestDescriptor.java:150)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+com.mercaplus.arquitectura.ReglasArquitecturaTest.la_web_no_expone_entidades -- Time elapsed: 0.045 s <<< FAILURE!
+java.lang.AssertionError: 
+Architecture Violation [Priority: MEDIUM] - Rule 'no classes that reside in a package '..controller..' should depend on classes that reside in a package '..model..', because la API debe exponer DTO, no entidades JPA' was violated (27 times):
+Method <com.mercaplus.controller.PedidoController.cancelar(java.lang.Long)> has return type <com.mercaplus.model.Pedido> in (PedidoController.java:0)
+Method <com.mercaplus.controller.PedidoController.crear(com.mercaplus.controller.PedidoController$SolicitudPedido)> calls constructor <com.mercaplus.model.LineaPedido.<init>()> in (PedidoController.java:55)
+Method <com.mercaplus.controller.PedidoController.crear(com.mercaplus.controller.PedidoController$SolicitudPedido)> calls constructor <com.mercaplus.model.Pedido.<init>()> in (PedidoController.java:40)
+Method <com.mercaplus.controller.PedidoController.crear(com.mercaplus.controller.PedidoController$SolicitudPedido)> calls method <com.mercaplus.model.LineaPedido.setCantidad(int)> in (PedidoController.java:57)
+Method <com.mercaplus.controller.PedidoController.crear(com.mercaplus.controller.PedidoController$SolicitudPedido)> calls method <com.mercaplus.model.LineaPedido.setPrecioUnitario(java.math.BigDecimal)> in (PedidoController.java:58)
+Method <com.mercaplus.controller.PedidoController.crear(com.mercaplus.controller.PedidoController$SolicitudPedido)> calls method <com.mercaplus.model.LineaPedido.setProducto(com.mercaplus.model.Producto)> in (PedidoController.java:56)
+Method <com.mercaplus.controller.PedidoController.crear(com.mercaplus.controller.PedidoController$SolicitudPedido)> calls method <com.mercaplus.model.Pedido.agregarLinea(com.mercaplus.model.LineaPedido)> in (PedidoController.java:59)
+Method <com.mercaplus.controller.PedidoController.crear(com.mercaplus.controller.PedidoController$SolicitudPedido)> calls method <com.mercaplus.model.Pedido.getLineas()> in (PedidoController.java:63)
+Method <com.mercaplus.controller.PedidoController.crear(com.mercaplus.controller.PedidoController$SolicitudPedido)> calls method <com.mercaplus.model.Pedido.getTotal()> in (PedidoController.java:67)
+Method <com.mercaplus.controller.PedidoController.crear(com.mercaplus.controller.PedidoController$SolicitudPedido)> calls method <com.mercaplus.model.Pedido.pagar()> in (PedidoController.java:69)
+Method <com.mercaplus.controller.PedidoController.crear(com.mercaplus.controller.PedidoController$SolicitudPedido)> calls method <com.mercaplus.model.Pedido.setClienteId(java.lang.String)> in (PedidoController.java:41)
+Method <com.mercaplus.controller.PedidoController.crear(com.mercaplus.controller.PedidoController$SolicitudPedido)> calls method <com.mercaplus.model.Pedido.setDescuento(java.math.BigDecimal)> in (PedidoController.java:64)
+Method <com.mercaplus.controller.PedidoController.crear(com.mercaplus.controller.PedidoController$SolicitudPedido)> calls method <com.mercaplus.model.Pedido.setTotal(java.math.BigDecimal)> in (PedidoController.java:65)
+Method <com.mercaplus.controller.PedidoController.crear(com.mercaplus.controller.PedidoController$SolicitudPedido)> calls method <com.mercaplus.model.Pedido.setTotal(java.math.BigDecimal)> in (PedidoController.java:67)
+Method <com.mercaplus.controller.PedidoController.crear(com.mercaplus.controller.PedidoController$SolicitudPedido)> calls method <com.mercaplus.model.Producto.getPrecio()> in (PedidoController.java:58)
+Method <com.mercaplus.controller.PedidoController.crear(com.mercaplus.controller.PedidoController$SolicitudPedido)> calls method <com.mercaplus.model.Producto.getPrecio()> in (PedidoController.java:60)
+Method <com.mercaplus.controller.PedidoController.crear(com.mercaplus.controller.PedidoController$SolicitudPedido)> calls method <com.mercaplus.model.Producto.getStock()> in (PedidoController.java:49)
+Method <com.mercaplus.controller.PedidoController.crear(com.mercaplus.controller.PedidoController$SolicitudPedido)> calls method <com.mercaplus.model.Producto.getStock()> in (PedidoController.java:52)
+Method <com.mercaplus.controller.PedidoController.crear(com.mercaplus.controller.PedidoController$SolicitudPedido)> calls method <com.mercaplus.model.Producto.setStock(int)> in (PedidoController.java:52)
+Method <com.mercaplus.controller.PedidoController.porCliente(java.lang.String)> has generic return type <java.util.List<com.mercaplus.model.Pedido>> with type argument depending on <com.mercaplus.model.Pedido> in (PedidoController.java:0)
+Method <com.mercaplus.controller.ProductoController.buscar(java.lang.String)> has generic return type <java.util.List<com.mercaplus.model.Producto>> with type argument depending on <com.mercaplus.model.Producto> in (ProductoController.java:0)
+Method <com.mercaplus.controller.ProductoController.buscar(java.lang.String)> references class object <com.mercaplus.model.Producto> in (ProductoController.java:30)
+Method <com.mercaplus.controller.ProductoController.cambiarPrecio(java.lang.Long, com.mercaplus.model.Producto)> calls method <com.mercaplus.model.Producto.getPrecio()> in (ProductoController.java:36)
+Method <com.mercaplus.controller.ProductoController.cambiarPrecio(java.lang.Long, com.mercaplus.model.Producto)> calls method <com.mercaplus.model.Producto.setPrecio(java.math.BigDecimal)> in (ProductoController.java:36)
+Method <com.mercaplus.controller.ProductoController.cambiarPrecio(java.lang.Long, com.mercaplus.model.Producto)> has parameter of type <com.mercaplus.model.Producto> in (ProductoController.java:0)
+Method <com.mercaplus.controller.ProductoController.cambiarPrecio(java.lang.Long, com.mercaplus.model.Producto)> has return type <com.mercaplus.model.Producto> in (ProductoController.java:0)
+Method <com.mercaplus.controller.ProductoController.listar()> has generic return type <java.util.List<com.mercaplus.model.Producto>> with type argument depending on <com.mercaplus.model.Producto> in (ProductoController.java:0)
+	at com.tngtech.archunit.lang.ArchRule$Assertions.assertNoViolation(ArchRule.java:94)
+	at com.tngtech.archunit.lang.ArchRule$Assertions.check(ArchRule.java:86)
+	at com.tngtech.archunit.lang.ArchRule$Factory$SimpleArchRule.check(ArchRule.java:165)
+	at com.tngtech.archunit.junit.internal.ArchUnitTestDescriptor$ArchUnitRuleDescriptor.execute(ArchUnitTestDescriptor.java:167)
+	at com.tngtech.archunit.junit.internal.ArchUnitTestDescriptor$ArchUnitRuleDescriptor.execute(ArchUnitTestDescriptor.java:150)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+

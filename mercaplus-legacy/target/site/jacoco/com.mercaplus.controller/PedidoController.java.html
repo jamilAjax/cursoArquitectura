@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PedidoController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">mercaplus-legacy</a> &gt; <a href="index.source.html" class="el_package">com.mercaplus.controller</a> &gt; <span class="el_source">PedidoController.java</span></div><h1>PedidoController.java</h1><pre class="source lang-java linenums"><span class="nc" id="L1">package com.mercaplus.controller;</span>
+
+import com.mercaplus.model.LineaPedido;
+import com.mercaplus.model.Pedido;
+import com.mercaplus.model.Producto;
+import com.mercaplus.repository.PedidoRepository;
+import com.mercaplus.repository.ProductoRepository;
+import com.mercaplus.service.PedidoService;
+import com.mercaplus.service.PromocionService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
+
+@RestController
+@RequestMapping(&quot;/api/pedidos&quot;)
+public class PedidoController {
+
+    private final PedidoRepository pedidoRepository;
+    private final ProductoRepository productoRepository;
+    private final PromocionService promocionService;
+    private final PedidoService pedidoService;
+
+<span class="nc" id="L26">    public PedidoController(PedidoRepository pedidoRepository, ProductoRepository productoRepository,</span>
+                            PromocionService promocionService, PedidoService pedidoService) {
+<span class="nc" id="L28">        this.pedidoRepository = pedidoRepository;</span>
+<span class="nc" id="L29">        this.productoRepository = productoRepository;</span>
+<span class="nc" id="L30">        this.promocionService = promocionService;</span>
+<span class="nc" id="L31">        this.pedidoService = pedidoService;</span>
+<span class="nc" id="L32">    }</span>
+
+    public record ItemSolicitud(String sku, int cantidad) {}
+    public record SolicitudPedido(String clienteId, List&lt;ItemSolicitud&gt; items) {}
+
+    @PostMapping
+    @Transactional
+    public ResponseEntity&lt;?&gt; crear(@RequestBody SolicitudPedido solicitud) {
+<span class="nc" id="L40">        Pedido pedido = new Pedido();</span>
+<span class="nc" id="L41">        pedido.setClienteId(solicitud.clienteId());</span>
+<span class="nc" id="L42">        BigDecimal subtotal = BigDecimal.ZERO;</span>
+
+<span class="nc bnc" id="L44" title="All 2 branches missed.">        for (ItemSolicitud item : solicitud.items()) {</span>
+<span class="nc" id="L45">            Producto producto = productoRepository.findBySku(item.sku()).orElse(null);</span>
+<span class="nc bnc" id="L46" title="All 2 branches missed.">            if (producto == null) {</span>
+<span class="nc" id="L47">                return ResponseEntity.badRequest().body(Map.of(&quot;error&quot;, &quot;Producto no existe: &quot; + item.sku()));</span>
+            }
+<span class="nc bnc" id="L49" title="All 2 branches missed.">            if (producto.getStock() &lt; item.cantidad()) {</span>
+<span class="nc" id="L50">                return ResponseEntity.badRequest().body(Map.of(&quot;error&quot;, &quot;Sin stock: &quot; + item.sku()));</span>
+            }
+<span class="nc" id="L52">            producto.setStock(producto.getStock() - item.cantidad());</span>
+<span class="nc" id="L53">            productoRepository.save(producto);</span>
+
+<span class="nc" id="L55">            LineaPedido linea = new LineaPedido();</span>
+<span class="nc" id="L56">            linea.setProducto(producto);</span>
+<span class="nc" id="L57">            linea.setCantidad(item.cantidad());</span>
+<span class="nc" id="L58">            linea.setPrecioUnitario(producto.getPrecio());</span>
+<span class="nc" id="L59">            pedido.agregarLinea(linea);</span>
+<span class="nc" id="L60">            subtotal = subtotal.add(producto.getPrecio().multiply(BigDecimal.valueOf(item.cantidad())));</span>
+        }
+
+<span class="nc" id="L63">        BigDecimal descuento = promocionService.calcularDescuento(pedido.getLineas());</span>
+<span class="nc" id="L64">        pedido.setDescuento(descuento);</span>
+<span class="nc" id="L65">        pedido.setTotal(subtotal.subtract(descuento));</span>
+<span class="nc bnc" id="L66" title="All 2 branches missed.">        if (subtotal.compareTo(new BigDecimal(&quot;300000&quot;)) &gt; 0) {</span>
+<span class="nc" id="L67">            pedido.setTotal(pedido.getTotal().multiply(new BigDecimal(&quot;0.95&quot;)));</span>
+        }
+<span class="nc" id="L69">        pedido.pagar();</span>
+<span class="nc" id="L70">        return ResponseEntity.ok(pedidoRepository.save(pedido));</span>
+    }
+
+    @GetMapping(&quot;/cliente/{clienteId}&quot;)
+    public List&lt;Pedido&gt; porCliente(@PathVariable String clienteId) {
+<span class="nc" id="L75">        return pedidoRepository.findByClienteId(clienteId);</span>
+    }
+
+    @PostMapping(&quot;/{id}/cancelar&quot;)
+    public Pedido cancelar(@PathVariable Long id) {
+<span class="nc" id="L80">        return pedidoService.cancelar(id);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.mercaplus.pedidos.infraestructura.PedidoJpaAdapterTest
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 10.23 s -- in com.mercaplus.pedidos.infraestructura.PedidoJpaAdapterTest

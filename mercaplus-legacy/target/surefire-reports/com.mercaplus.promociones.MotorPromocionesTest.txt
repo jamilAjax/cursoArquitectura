@@ -1,0 +1,12 @@
+-------------------------------------------------------------------------------
+Test set: com.mercaplus.promociones.MotorPromocionesTest
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.127 s <<< FAILURE! -- in com.mercaplus.promociones.MotorPromocionesTest
+com.mercaplus.promociones.MotorPromocionesTest.regla1_sinPromociones_elTotalEsLaSumaDePrecioPorCantidad -- Time elapsed: 0.051 s <<< ERROR!
+java.lang.UnsupportedOperationException: Implementar con TDD - empieza por la regla 1
+	at com.mercaplus.promociones.MotorPromociones.totalAPagar(MotorPromociones.java:30)
+	at com.mercaplus.promociones.MotorPromocionesTest.regla1_sinPromociones_elTotalEsLaSumaDePrecioPorCantidad(MotorPromocionesTest.java:26)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+

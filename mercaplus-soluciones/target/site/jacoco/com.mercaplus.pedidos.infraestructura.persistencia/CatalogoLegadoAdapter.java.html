@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CatalogoLegadoAdapter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">mercaplus-legacy</a> &gt; <a href="index.source.html" class="el_package">com.mercaplus.pedidos.infraestructura.persistencia</a> &gt; <span class="el_source">CatalogoLegadoAdapter.java</span></div><h1>CatalogoLegadoAdapter.java</h1><pre class="source lang-java linenums">package com.mercaplus.pedidos.infraestructura.persistencia;
+
+import com.mercaplus.model.Producto;
+import com.mercaplus.pedidos.aplicacion.puerto.salida.CatalogoPort;
+import com.mercaplus.repository.ProductoRepository;
+import org.springframework.stereotype.Component;
+
+import java.util.Optional;
+
+/**
+ * Capa anticorrupcion: el nuevo modulo lee el catalogo del monolito sin que el
+ * modelo legado (entidad Producto) se filtre hacia el dominio.
+ */
+@Component
+public class CatalogoLegadoAdapter implements CatalogoPort {
+
+    private final ProductoRepository productos;
+
+<span class="nc" id="L19">    public CatalogoLegadoAdapter(ProductoRepository productos) {</span>
+<span class="nc" id="L20">        this.productos = productos;</span>
+<span class="nc" id="L21">    }</span>
+
+    @Override
+    public Optional&lt;ProductoCatalogo&gt; buscarPorSku(String sku) {
+<span class="nc" id="L25">        return productos.findBySku(sku)</span>
+<span class="nc" id="L26">                .map(p -&gt; new ProductoCatalogo(p.getSku(), p.getCategoria(), p.getPrecio(), p.getStock(), p.isPromo2x1()));</span>
+    }
+
+    @Override
+    public void reservarStock(String sku, int cantidad) {
+<span class="nc" id="L31">        Producto p = productos.findBySku(sku).orElseThrow();</span>
+<span class="nc" id="L32">        p.setStock(p.getStock() - cantidad);</span>
+<span class="nc" id="L33">        productos.save(p);</span>
+<span class="nc" id="L34">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

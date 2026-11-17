@@ -1,0 +1,15 @@
+/home/jamil/curso/mercaplus-legacy/src/main/java/com/mercaplus/MercaPlusApplication.java
+/home/jamil/curso/mercaplus-legacy/src/main/java/com/mercaplus/controller/CarritoController.java
+/home/jamil/curso/mercaplus-legacy/src/main/java/com/mercaplus/controller/PedidoController.java
+/home/jamil/curso/mercaplus-legacy/src/main/java/com/mercaplus/controller/ProductoController.java
+/home/jamil/curso/mercaplus-legacy/src/main/java/com/mercaplus/model/LineaPedido.java
+/home/jamil/curso/mercaplus-legacy/src/main/java/com/mercaplus/model/Pedido.java
+/home/jamil/curso/mercaplus-legacy/src/main/java/com/mercaplus/model/Producto.java
+/home/jamil/curso/mercaplus-legacy/src/main/java/com/mercaplus/promociones/Item.java
+/home/jamil/curso/mercaplus-legacy/src/main/java/com/mercaplus/promociones/MotorPromociones.java
+/home/jamil/curso/mercaplus-legacy/src/main/java/com/mercaplus/repository/PedidoRepository.java
+/home/jamil/curso/mercaplus-legacy/src/main/java/com/mercaplus/repository/ProductoRepository.java
+/home/jamil/curso/mercaplus-legacy/src/main/java/com/mercaplus/service/CarritoService.java
+/home/jamil/curso/mercaplus-legacy/src/main/java/com/mercaplus/service/PedidoService.java
+/home/jamil/curso/mercaplus-legacy/src/main/java/com/mercaplus/service/PromocionService.java
+/home/jamil/curso/mercaplus-legacy/src/main/java/com/mercaplus/util/PasarelaPagosClient.java

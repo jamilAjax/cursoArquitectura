@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Pedido.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">mercaplus-legacy</a> &gt; <a href="index.source.html" class="el_package">com.mercaplus.model</a> &gt; <span class="el_source">Pedido.java</span></div><h1>Pedido.java</h1><pre class="source lang-java linenums">package com.mercaplus.model;
+
+import com.mercaplus.util.PasarelaPagosClient;
+import jakarta.persistence.*;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity
+@Table(name = &quot;pedido&quot;)
+<span class="fc" id="L12">public class Pedido {</span>
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String clienteId;
+<span class="fc" id="L18">    private LocalDateTime fecha = LocalDateTime.now();</span>
+<span class="fc" id="L19">    private String estado = &quot;NUEVO&quot;;</span>
+<span class="fc" id="L20">    private BigDecimal total = BigDecimal.ZERO;</span>
+<span class="fc" id="L21">    private BigDecimal descuento = BigDecimal.ZERO;</span>
+    private String referenciaPago;
+
+    @OneToMany(mappedBy = &quot;pedido&quot;, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+<span class="fc" id="L25">    private List&lt;LineaPedido&gt; lineas = new ArrayList&lt;&gt;();</span>
+
+    public void pagar() {
+<span class="nc" id="L28">        String ref = PasarelaPagosClient.cobrar(clienteId, total);</span>
+<span class="nc bnc" id="L29" title="All 2 branches missed.">        if (ref != null) {</span>
+<span class="nc" id="L30">            this.referenciaPago = ref;</span>
+<span class="nc" id="L31">            this.estado = &quot;PAGADO&quot;;</span>
+<span class="nc" id="L32">        } else {</span>
+<span class="nc" id="L33">            this.estado = &quot;PAGO_RECHAZADO&quot;;</span>
+        }
+<span class="nc" id="L35">    }</span>
+
+    public void agregarLinea(LineaPedido linea) {
+<span class="nc" id="L38">        linea.setPedido(this);</span>
+<span class="nc" id="L39">        lineas.add(linea);</span>
+<span class="nc" id="L40">    }</span>
+
+<span class="nc" id="L42">    public Long getId() { return id; }</span>
+<span class="nc" id="L43">    public String getClienteId() { return clienteId; }</span>
+<span class="nc" id="L44">    public void setClienteId(String clienteId) { this.clienteId = clienteId; }</span>
+<span class="nc" id="L45">    public LocalDateTime getFecha() { return fecha; }</span>
+<span class="fc" id="L46">    public String getEstado() { return estado; }</span>
+<span class="fc" id="L47">    public void setEstado(String estado) { this.estado = estado; }</span>
+<span class="fc" id="L48">    public BigDecimal getTotal() { return total; }</span>
+<span class="fc" id="L49">    public void setTotal(BigDecimal total) { this.total = total; }</span>
+<span class="nc" id="L50">    public BigDecimal getDescuento() { return descuento; }</span>
+<span class="nc" id="L51">    public void setDescuento(BigDecimal descuento) { this.descuento = descuento; }</span>
+<span class="nc" id="L52">    public String getReferenciaPago() { return referenciaPago; }</span>
+<span class="nc" id="L53">    public List&lt;LineaPedido&gt; getLineas() { return lineas; }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

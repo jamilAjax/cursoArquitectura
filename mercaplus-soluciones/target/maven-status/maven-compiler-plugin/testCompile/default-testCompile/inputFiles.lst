@@ -1,0 +1,10 @@
+/home/jamil/curso/mercaplus-soluciones/src/test/java/com/mercaplus/arquitectura/ReglasArquitecturaTest.java
+/home/jamil/curso/mercaplus-soluciones/src/test/java/com/mercaplus/arquitectura/ReglasHexagonalesTest.java
+/home/jamil/curso/mercaplus-soluciones/src/test/java/com/mercaplus/controller/ProductoControllerSeguridadTest.java
+/home/jamil/curso/mercaplus-soluciones/src/test/java/com/mercaplus/pedidos/aplicacion/CrearPedidoServiceTest.java
+/home/jamil/curso/mercaplus-soluciones/src/test/java/com/mercaplus/pedidos/dominio/LineaPedidoTest.java
+/home/jamil/curso/mercaplus-soluciones/src/test/java/com/mercaplus/pedidos/dominio/PedidoTest.java
+/home/jamil/curso/mercaplus-soluciones/src/test/java/com/mercaplus/pedidos/infraestructura/PedidoJpaAdapterTest.java
+/home/jamil/curso/mercaplus-soluciones/src/test/java/com/mercaplus/pedidos/infraestructura/PedidoRestControllerTest.java
+/home/jamil/curso/mercaplus-soluciones/src/test/java/com/mercaplus/promociones/MotorPromocionesTest.java
+/home/jamil/curso/mercaplus-soluciones/src/test/java/com/mercaplus/service/PedidoServiceTest.java
