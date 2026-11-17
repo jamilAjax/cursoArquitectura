@@ -1,13 +1,20 @@
 # SOLUCION LAB 5 - Pipeline DevSecOps con fitness functions
+# GitHub solo lee workflows en .github/workflows/ de la RAIZ del repositorio,
+# por eso vive aqui y apunta a la subcarpeta mercaplus-soluciones.
 name: ci
 
 on:
   pull_request:
   push:
     branches: [ main ]
+    paths: [ 'mercaplus-soluciones/**', '.github/workflows/**' ]
 
 permissions:
   contents: read
+
+defaults:
+  run:
+    working-directory: mercaplus-soluciones
 
 jobs:
   construir-y-probar:
@@ -19,6 +26,7 @@ jobs:
           distribution: temurin
           java-version: '21'
           cache: maven
+          cache-dependency-path: mercaplus-soluciones/pom.xml
 
       - name: Compilar, pruebas y umbral de cobertura (JaCoCo >= 80 % en codigo nuevo)
         run: mvn -B verify
@@ -30,6 +38,7 @@ jobs:
         uses: aquasecurity/trivy-action@0.28.0
         with:
           scan-type: fs
+          scan-ref: mercaplus-soluciones
           scanners: vuln,secret
           severity: CRITICAL,HIGH
           exit-code: '1'
